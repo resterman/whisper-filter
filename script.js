@@ -67,7 +67,8 @@ function init() {
         if (a.data.success) {
             var b = this;
             this._holodeck.filterIncomingMessage(a.data.message, function(c) {
-                b.displayUnsanitizedMessage(a.data.from, c + '&nbsp; (<a class="reply_link" onclick="if (!event.ctrlKey) { holodeck.insertPrivateMessagePrefixFor(\'' + a.data.from + '\');} else { holodeck.showConversationWith(\'' + a.data.from.toLowerCase() + '\') };return false;" href="#">reply</a>)', {
+                for(var room in b._holodeck._chat_window._rooms._object)
+                b._holodeck._chat_window._rooms._object[room]._chat_dialogue.displayUnsanitizedMessage(a.data.from, c + '&nbsp; (<a class="reply_link" onclick="if (!event.ctrlKey) { holodeck.insertPrivateMessagePrefixFor(\'' + a.data.from + '\');} else { holodeck.showConversationWith(\'' + a.data.from.toLowerCase() + '\') };return false;" href="#">reply</a>)', {
                     "class": "whisper received_whisper"
                 }, {
                     whisper: !0
