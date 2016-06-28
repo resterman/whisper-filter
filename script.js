@@ -67,7 +67,7 @@ function init() {
 
     ChatDialogue.MESSAGE_TEMPLATE.evaluate=function(a){
         if(a.message) a.message=a.message.replace('<a class="reply_link" onclick="holodeck.insertPrivateMessagePrefixFor(\''+a.username+'\');return false;" href="#">reply</a>', '<a class="reply_link" onclick="if(!event.ctrlKey) holodeck.insertPrivateMessagePrefixFor(\''+a.username+'\'); else holodeck.showConversationWith(\''+a.username+'\'); return false;" href="#">reply</a>');
-        return ChatDialogue.MESSAGE_TEMPLATE.evaluateAntesDeWF(a)
+        return ChatDialogue.MESSAGE_TEMPLATE.evaluateAntesDeWF(a);
     };
 
     ChatDialogue.prototype.sendPrivateMessageAntesDeWF=ChatDialogue.prototype.sendPrivateMessage;
