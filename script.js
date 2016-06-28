@@ -77,6 +77,13 @@ function init() {
         } else this.kongBotMessage(a.data.to + " cannot be reached. Please try again later.");
     };
 
+    ChatDialogue.prototype.sendPrivateMessageAntesDeWF=ChatDialogue.prototype.sendPrivateMessage
+
+    ChatDialogue.prototype.sendPrivateMessage=function(a, b){
+        this.sendPrivateMessageAntesDeWF(a, b);
+        for(var room in this._holodeck._chat_window._rooms._object) if(this._holodeck._chat_window._rooms._object[room]._chat_dialogue!=this) this._holodeck._chat_window._rooms._object[room]._chat_dialogue.displayMessage(a, b, {"class": "whisper sent_whisper"}, {"private": !0})
+    };
+
     holodeck.addChatCommand('wf', function (a, b) {
         var args = b.split(' ');
         if (args.length >= 2) {
@@ -103,4 +110,3 @@ function init() {
         return !1;
     });
 }
-
