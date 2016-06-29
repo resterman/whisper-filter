@@ -66,7 +66,8 @@ function init() {
     ChatDialogue.MESSAGE_TEMPLATE.evaluateAntesDeWF=ChatDialogue.MESSAGE_TEMPLATE.evaluate;
 
     ChatDialogue.MESSAGE_TEMPLATE.evaluate=function(a){
-        if(a.message) a.message=a.message.replace('<a class="reply_link" onclick="holodeck.insertPrivateMessagePrefixFor(\''+a.username+'\');return false;" href="#">reply</a>', '<a class="reply_link" onclick="if(!event.ctrlKey) holodeck.insertPrivateMessagePrefixFor(\''+a.username+'\'); else holodeck.showConversationWith(\''+a.username+'\'); return false;" href="#">reply</a>');
+        const regExp=/(<a.*onclick=")(.*(\('.{4,16}'\));return.*)/i;
+        if(a.message) a.message=a.message.replace(regExp, '$1if(event.ctrlKey) holodeck.showConversationWith$3; else $2');
         return ChatDialogue.MESSAGE_TEMPLATE.evaluateAntesDeWF(a);
     };
 
@@ -74,7 +75,11 @@ function init() {
 
     ChatDialogue.prototype.sendPrivateMessage=function(a, b){
         this.sendPrivateMessageAntesDeWF(a, b);
-        for(var room in this._holodeck._chat_window._rooms._object) if(this._holodeck._chat_window._rooms._object[room]._chat_dialogue!=this) this._holodeck._chat_window._rooms._object[room]._chat_dialogue.displayMessage(a, b, {"class": "whisper sent_whisper"}, {"private": !0});
+        for(var room in this._holodeck._chat_window._rooms._object){
+            if(this._holodeck._chat_window._rooms._object[room]._chat_dialogue!=this){
+                this._holodeck._chat_window._rooms._object[room]._chat_dialogue.displayMessage(a, b, {"class": "whisper sent_whisper"}, {"private": !0});
+            }
+        }
     };
 
     holodeck.addChatCommand('wf', function (a, b) {
