@@ -63,17 +63,23 @@ function init() {
         return new Set(users);
     };
 
-    ChatDialogue.prototype.receivedPrivateMessage = function(a) {
-        if (a.data.success) {
-            var b = this;
-            this._holodeck.filterIncomingMessage(a.data.message, function(c) {
-                b.displayUnsanitizedMessage(a.data.from, c + '&nbsp; (<a class="reply_link" onclick="if (!event.ctrlKey) { holodeck.insertPrivateMessagePrefixFor(\'' + a.data.from + '\');} else { holodeck.showConversationWith(\'' + a.data.from.toLowerCase() + '\') };return false;" href="#">reply</a>)', {
-                    "class": "whisper received_whisper"
-                }, {
-                    whisper: !0
-                });
-            });
-        } else this.kongBotMessage(a.data.to + " cannot be reached. Please try again later.");
+    ChatDialogue.MESSAGE_TEMPLATE.evaluateAntesDeWF=ChatDialogue.MESSAGE_TEMPLATE.evaluate;
+
+    ChatDialogue.MESSAGE_TEMPLATE.evaluate=function(a){
+        const regExp=/(<a.*onclick=")(.*(\('.{4,16}'\));return.*)/i;
+        if(a.message) a.message=a.message.replace(regExp, '$1if(event.ctrlKey) holodeck.showConversationWith$3; else $2');
+        return ChatDialogue.MESSAGE_TEMPLATE.evaluateAntesDeWF(a);
+    };
+
+    ChatDialogue.prototype.sendPrivateMessageAntesDeWF=ChatDialogue.prototype.sendPrivateMessage;
+
+    ChatDialogue.prototype.sendPrivateMessage=function(a, b){
+        this.sendPrivateMessageAntesDeWF(a, b);
+        for(var room in this._holodeck._chat_window._rooms._object){
+            if(this._holodeck._chat_window._rooms._object[room]._chat_dialogue!=this){
+                this._holodeck._chat_window._rooms._object[room]._chat_dialogue.displayMessage(a, b, {"class": "whisper sent_whisper"}, {"private": !0});
+            }
+        }
     };
 
     holodeck.addChatCommand('wf', function (a, b) {
@@ -102,4 +108,3 @@ function init() {
         return !1;
     });
 }
-
