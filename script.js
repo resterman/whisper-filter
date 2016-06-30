@@ -49,7 +49,7 @@ function init() {
             .filter(x => x.select('.whisper').length > 0)
             .filter(x => {
                 var u = x.select('.username');
-                return u.length > 0 && (user?new RegExp(user, 'i').test(u[0].readAttribute('username')):true);
+                return u.length > 0 && (!user||new RegExp(user, 'i').test(u[0].readAttribute('username')));
             })
             .map(x => x.show());
     };
@@ -74,7 +74,11 @@ function init() {
 
     ChatDialogue.prototype.sendPrivateMessage=function(a, b){
         this.sendPrivateMessageAntesDeWF(a, b);
-        for(var room in this._holodeck._chat_window._rooms._object) if(this._holodeck._chat_window._rooms._object[room]._chat_dialogue!=this) this._holodeck._chat_window._rooms._object[room]._chat_dialogue.displayMessage(a, b, {"class": "whisper sent_whisper"}, {"private": !0});
+        for(var room in this._holodeck._chat_window._rooms._object){
+            if(this._holodeck._chat_window._rooms._object[room]._chat_dialogue!=this){
+                this._holodeck._chat_window._rooms._object[room]._chat_dialogue.displayMessage(a, b, {"class": "whisper sent_whisper"}, {"private": !0});
+            }
+        }
     };
 
     holodeck.whisperFilter=null;
