@@ -40,7 +40,7 @@ function init() {
     Holodeck.prototype.showWhispersOnly = function (user) {
         var w = this.activeDialogue()._message_window_node;
         this.whisperFilter = {
-            user: user,
+            [user?'user':'mostrandoTodosLosWhispers']: user?user:true,
             scrollTop: w.scrollTop
         };
 
@@ -49,8 +49,7 @@ function init() {
             .filter(x => x.select('.whisper').length > 0)
             .filter(x => {
                 var u = x.select('.username');
-                return u.length > 0 && new RegExp(user, 'i')
-                    .test(u[0].readAttribute('username'));
+                return u.length > 0 && (user?new RegExp(user, 'i').test(u[0].readAttribute('username')):true);
             })
             .map(x => x.show());
     };
@@ -75,12 +74,10 @@ function init() {
 
     ChatDialogue.prototype.sendPrivateMessage=function(a, b){
         this.sendPrivateMessageAntesDeWF(a, b);
-        for(var room in this._holodeck._chat_window._rooms._object){
-            if(this._holodeck._chat_window._rooms._object[room]._chat_dialogue!=this){
-                this._holodeck._chat_window._rooms._object[room]._chat_dialogue.displayMessage(a, b, {"class": "whisper sent_whisper"}, {"private": !0});
-            }
-        }
+        for(var room in this._holodeck._chat_window._rooms._object) if(this._holodeck._chat_window._rooms._object[room]._chat_dialogue!=this) this._holodeck._chat_window._rooms._object[room]._chat_dialogue.displayMessage(a, b, {"class": "whisper sent_whisper"}, {"private": !0});
     };
+
+    holodeck.whisperFilter=null;
 
     holodeck.addChatCommand('wf', function (a, b) {
         var args = b.split(' ');
@@ -103,7 +100,15 @@ function init() {
                     {non_user: !0}
                 );
             }
-        } else holodeck.showAllMessages();
+        }
+        else if(holodeck.whisperFilter && (holodeck.whisperFilter.user || holodeck.whisperFilter.mostrandoTodosLosWhispers)) holodeck.showAllMessages();
+        else if(!holodeck.getWhisperUsers().size) holodeck.activeDialogue().displayMessage(
+            "Whisper Filter",
+            "You have no whispers",
+            {"class": "whisper received_whisper"},
+            {non_user: !0}
+        );
+        else holodeck.showConversationWith();
 
         return !1;
     });
